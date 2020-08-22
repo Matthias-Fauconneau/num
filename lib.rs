@@ -28,6 +28,7 @@ signed_impl!(i16 i32 f32);
 pub fn sign<T:Signed>(x : T) -> T { x.signum() }
 pub fn abs<T:Signed>(x : T) -> T { x.abs() }
 pub fn sq<T:Copy+std::ops::Mul>(x: T) -> T::Output { x*x }
+pub fn cb<T:Copy+std::ops::Mul>(x: T) -> <T::Output as std::ops::Mul<T>>::Output where <T as std::ops::Mul>::Output : std::ops::Mul<T> { x*x*x }
 
 pub fn div_floor(n : u32, d : u32) -> u32 { n/d }
 #[track_caller] pub fn div_ceil(n : u32, d : u32) -> u32 { (n+d-1)/d }
@@ -45,6 +46,8 @@ pub fn idiv_ceil(n: i32, d: u32) -> i32 {
 pub fn floor(x : f32) -> f32 { x.floor() }
 pub fn fract(x: f32) -> f32 { x.fract() }
 pub fn sqrt(x: f32) -> f32 { x.sqrt() }
+pub fn cos(x: f32) -> f32 { x.cos() }
+pub fn sin(x: f32) -> f32 { x.sin() }
 pub fn atan(y: f32, x: f32) -> f32 { y.atan2(x) }
 
 pub fn clamp<T:PartialOrd>(min: T, x: T, max: T) -> T { if x < min {min} else if x > max {max} else {x} }
