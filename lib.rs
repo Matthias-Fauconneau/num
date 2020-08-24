@@ -22,6 +22,8 @@ impl<T:Zero+PartialEq> IsZero for T { fn is_zero(&self) -> bool { self == &Zero:
 //pub trait DefaultZero : Default {}
 //impl<T:DefaultZero> Zero for T { fn zero() -> Self { Default::default() } }
 
+pub fn zero<T:Zero>() -> T { T::zero() }
+
 pub trait Signed { fn signum(&self) -> Self; fn abs(&self) -> Self; }
 macro_rules! signed_impl { ($($T:ty)+) => ($( impl Signed for $T { fn signum(&self) -> Self { <$T>::signum(*self) } fn abs(&self) -> Self { <$T>::abs(*self) } } )+) }
 signed_impl!(i16 i32 f32);
