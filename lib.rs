@@ -1,4 +1,4 @@
-#![cfg_attr(feature="array", feature(min_const_generics))]
+#![feature(min_const_generics, const_in_array_repeat_expressions, const_fn)]
 
 pub trait IsZero {
 	fn is_zero(&self) -> bool;
@@ -7,22 +7,22 @@ pub trait IsZero {
 	//fn is_some(&self) -> bool { self.is_nonzero() } // final
 }
 
-pub trait Zero { fn zero() -> Self; }
-impl Zero for u32 { fn zero() -> Self { 0 } }
-impl Zero for u64 { fn zero() -> Self { 0 } }
-impl Zero for usize { fn zero() -> Self { 0 } }
-impl Zero for i32 { fn zero() -> Self { 0 } }
-impl Zero for f32 { fn zero() -> Self { 0. } }
-impl Zero for f64 { fn zero() -> Self { 0. } }
-impl<T0:Zero,T1:Zero> Zero for (T0,T1) { fn zero() -> Self { (Zero::zero(),Zero::zero()) } }
-#[cfg(feature="array")] impl<T: Zero, const N:usize> Zero for [T; N] { fn zero() -> Self { array::map(|_| crate::num::Zero::zero()) } }
+pub trait Zero { const ZERO: Self; }
+impl Zero for u32 { const ZERO: Self = 0; }
+impl Zero for u64 { const ZERO : Self = 0; }
+impl Zero for usize { const ZERO : Self = 0; }
+impl Zero for i32 { const ZERO : Self = 0; }
+impl Zero for f32 { const ZERO : Self = 0.; }
+impl Zero for f64 { const ZERO : Self = 0.; }
+impl<T0:Zero,T1:Zero> Zero for (T0,T1) { const ZERO : Self = (Zero::ZERO,Zero::ZERO); }
+impl<T: Zero, const N: usize> Zero for [T; N] { const ZERO : Self = [Zero::ZERO; N]; }
 
-impl<T:Zero+PartialEq> IsZero for T { fn is_zero(&self) -> bool { self == &Zero::zero() } }
+impl<T:Zero+PartialEq> IsZero for T { fn is_zero(&self) -> bool { self == &Zero::ZERO} }
 
 //pub trait DefaultZero : Default {}
 //impl<T:DefaultZero> Zero for T { fn zero() -> Self { Default::default() } }
 
-pub fn zero<T:Zero>() -> T { T::zero() }
+pub const fn zero<T:Zero>() -> T { T::ZERO }
 
 pub trait Signed { fn signum(&self) -> Self; fn abs(&self) -> Self; }
 macro_rules! signed_impl { ($($T:ty)+) => ($( impl Signed for $T { fn signum(&self) -> Self { <$T>::signum(*self) } fn abs(&self) -> Self { <$T>::abs(*self) } } )+) }
