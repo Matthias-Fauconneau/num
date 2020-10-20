@@ -1,11 +1,6 @@
 #![feature(min_const_generics, const_in_array_repeat_expressions, const_fn)]
 
-pub trait IsZero {
-	fn is_zero(&self) -> bool;
-	fn is_nonzero(&self) -> bool { !self.is_zero() } // final
-	//fn is_none(&self) -> bool { self.is_zero() } // final
-	//fn is_some(&self) -> bool { self.is_nonzero() } // final
-}
+pub trait IsZero { fn is_zero(&self) -> bool; }
 
 pub trait Zero { const ZERO: Self; }
 impl Zero for u32 { const ZERO: Self = 0; }
@@ -19,9 +14,6 @@ impl<T: Zero, const N: usize> Zero for [T; N] { const ZERO : Self = [Zero::ZERO;
 
 impl<T:Zero+PartialEq> IsZero for T { fn is_zero(&self) -> bool { self == &Zero::ZERO} }
 
-//pub trait DefaultZero : Default {}
-//impl<T:DefaultZero> Zero for T { fn zero() -> Self { Default::default() } }
-
 pub const fn zero<T:Zero>() -> T { T::ZERO }
 
 pub trait Signed { fn signum(&self) -> Self; fn abs(&self) -> Self; }
@@ -33,7 +25,7 @@ pub fn sq<T:Copy+std::ops::Mul>(x: T) -> T::Output { x*x }
 pub fn cb<T:Copy+std::ops::Mul>(x: T) -> <T::Output as std::ops::Mul<T>>::Output where <T as std::ops::Mul>::Output : std::ops::Mul<T> { x*x*x }
 
 pub fn div_floor(n : u32, d : u32) -> u32 { n/d }
-#[track_caller] pub fn div_ceil(n : u32, d : u32) -> u32 { (n+d-1)/d }
+pub fn div_ceil(n : u32, d : u32) -> u32 { (n+d-1)/d }
 
 pub fn idiv_rem(n : i32, d : u32) -> (i32, i32) { (n/d as i32, n%d as i32) }
 pub fn idiv_floor(n: i32, d: u32) -> i32 {
@@ -62,8 +54,8 @@ impl Ratio {
 	pub fn iceil(&self, x: i32) -> i32 { idiv_ceil(x * self.num as i32, self.div) }
 }
 impl From<Ratio> for f32 { fn from(r: Ratio) -> Self { r.num as f32 / r.div as f32 } }
-impl std::ops::Mul<u32> for Ratio { type Output=u32; #[track_caller] fn mul(self, b: u32) -> Self::Output { div_floor(b * self.num, self.div) } }
+impl std::ops::Mul<u32> for Ratio { type Output=u32; fn mul(self, b: u32) -> Self::Output { div_floor(b * self.num, self.div) } }
 impl std::ops::Div<Ratio> for u32 { type Output=u32; fn div(self, r: Ratio) -> Self::Output { div_floor(self * r.div, r.num) } }
-impl std::ops::Div<Ratio> for i32 { type Output=i32; #[track_caller] fn div(self, r: Ratio) -> Self::Output { idiv_floor(self * r.div as i32, r.num) } }
+impl std::ops::Div<Ratio> for i32 { type Output=i32; fn div(self, r: Ratio) -> Self::Output { idiv_floor(self * r.div as i32, r.num) } }
 impl std::ops::Mul<f32> for Ratio { type Output=f32; fn mul(self, b: f32) -> Self::Output { b * self.num as f32 / self.div as f32 } } // loses precision
 impl std::ops::Div<Ratio> for f32 { type Output=f32; fn div(self, r: Ratio) -> Self::Output { self * r.div as f32 / r.num as f32 } } // loses precision
