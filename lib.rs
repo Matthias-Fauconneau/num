@@ -90,15 +90,22 @@ impl std::ops::Mul<&real> for &real { type Output = real; fn mul(self, b: &real)
 impl std::iter::Product<Self> for real { fn product<I:Iterator<Item=Self>>(iter: I) -> Self { real(iter.map(|real(f)| f).product()) } }
 impl std::iter::Product<&'t Self> for real { fn product<I:Iterator<Item=&'t Self>>(iter: I) -> Self { real(iter.map(|real(f)| f).product()) } }
 
-impl std::ops::Div<Self> for real { type Output = Self; fn div(self, b: Self) -> Self { assert!(!IsZero::is_zero(&b)); real(self.0.div(b.0)) } }
-impl std::ops::Div<real> for &real { type Output = real; fn div(self, b: real) -> Self::Output { assert!(!IsZero::is_zero(&b)); real(self.0.div(b.0)) } }
-impl std::ops::Div<&real> for real { type Output = Self; fn div(self, b: &real) -> Self { assert!(!IsZero::is_zero(b)); real(self.0.div(b.0)) } }
+impl std::ops::Div<Self> for real { type Output = Self; #[track_caller] fn div(self, b: Self) -> Self { assert!(!IsZero::is_zero(&b)); real(self.0.div(b.0)) } }
+impl std::ops::Div<real> for &real { type Output = real; #[track_caller] fn div(self, b: real) -> Self::Output { assert!(!IsZero::is_zero(&b)); real(self.0.div(b.0)) } }
+impl std::ops::Div<&real> for real { type Output = Self; #[track_caller] fn div(self, b: &real) -> Self { assert!(!IsZero::is_zero(b)); real(self.0.div(b.0)) } }
+
+impl std::fmt::LowerExp for real { fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { self.0.fmt(fmt) } }
 
 impl real {
+	pub fn abs(self) -> real { real(f32::abs(self.0)) }
 	pub fn recip(self) -> real { real(f32::recip(self.0)) }
+	pub fn floor(self) -> real { real(f32::floor(self.0)) }
+	pub fn ceil(self) -> real { real(f32::ceil(self.0)) }
 	pub fn exp(self) -> real { real(f32::exp(self.0)) }
 	pub fn pow(self, n: real) -> real { real(f32::powf(self.0, n.0)) }
 	pub fn powi(self, n: i32) -> real { real(f32::powi(self.0, n)) }
+	pub fn log2(self) -> real { real(f32::log2(self.0)) }
 	pub fn ln(self) -> real { real(f32::ln(self.0)) }
 	pub fn log10(self) -> real { real(f32::log10(self.0)) }
+	pub fn exp10(self) -> real { real::exp(real::ln(real(10.))*self) }
 }
