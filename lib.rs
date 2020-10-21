@@ -99,13 +99,13 @@ impl std::fmt::LowerExp for real { fn fmt(&self, fmt: &mut std::fmt::Formatter<'
 impl real {
 	pub fn abs(self) -> real { real(f32::abs(self.0)) }
 	pub fn recip(self) -> real { real(f32::recip(self.0)) }
+	pub fn powi(self, n: i32) -> real { real(f32::powi(self.0, n)) }
 	pub fn floor(self) -> real { real(f32::floor(self.0)) }
 	pub fn ceil(self) -> real { real(f32::ceil(self.0)) }
+	pub fn exp2(self) -> real { real(f32::exp2(self.0)) }
 	pub fn exp(self) -> real { real(f32::exp(self.0)) }
-	pub fn pow(self, n: real) -> real { real(f32::powf(self.0, n.0)) }
-	pub fn powi(self, n: i32) -> real { real(f32::powi(self.0, n)) }
-	pub fn log2(self) -> real { real(f32::log2(self.0)) }
-	pub fn ln(self) -> real { real(f32::ln(self.0)) }
-	pub fn log10(self) -> real { real(f32::log10(self.0)) }
 	pub fn exp10(self) -> real { real::exp(real::ln(real(10.))*self) }
+	pub fn pow(self, n: real) -> real { real(f32::powf(self.0, n.0)) }
+	#[track_caller] pub fn ln(self) -> real { assert!(self>zero(),"ln {:?}", self); real(f32::ln(self.0)) }
+	#[track_caller] pub fn log10(self) -> real { assert!(self>zero(),"log10 {:?}", self); real(f32::log10(self.0)) }
 }
