@@ -1,4 +1,4 @@
-#![feature(min_const_generics, const_in_array_repeat_expressions, const_fn, in_band_lifetimes)]
+#![feature(min_const_generics, const_in_array_repeat_expressions, const_fn)]
 
 pub trait IsZero { fn is_zero(&self) -> bool; }
 
@@ -18,11 +18,16 @@ pub const fn zero<T:Zero>() -> T { T::ZERO }
 
 pub trait Signed { fn signum(&self) -> Self; fn abs(&self) -> Self; }
 macro_rules! signed_impl { ($($T:ty)+) => ($( impl Signed for $T { fn signum(&self) -> Self { <$T>::signum(*self) } fn abs(&self) -> Self { <$T>::abs(*self) } } )+) }
-signed_impl!(i16 i32 f32);
+signed_impl!(i16 i32 f32 f64);
 pub fn sign<T:Signed>(x : T) -> T { x.signum() }
 pub fn abs<T:Signed>(x : T) -> T { x.abs() }
-pub fn sq<T:Copy+std::ops::Mul>(x: T) -> T::Output { x*x }
-pub fn cb<T:Copy+std::ops::Mul>(x: T) -> <T::Output as std::ops::Mul<T>>::Output where <T as std::ops::Mul>::Output : std::ops::Mul<T> { x*x*x }
+
+use std::{ops::Mul, iter::Sum};
+
+pub fn sq<T:Copy+Mul>(x: T) -> T::Output { x*x }
+pub fn cb<T:Copy+Mul>(x: T) -> <T::Output as std::ops::Mul<T>>::Output where <T as std::ops::Mul>::Output : std::ops::Mul<T> { x*x*x }
+
+pub fn norm<T: Copy+Mul>(iter: impl IntoIterator<Item=T>) -> T::Output where T::Output:Sum+Sqrt { iter.into_iter().map(sq).sum::<T::Output>().sqrt() }
 
 pub fn div_floor(n : u32, d : u32) -> u32 { n/d }
 pub fn div_ceil(n : u32, d : u32) -> u32 { (n+d-1)/d }
@@ -39,7 +44,10 @@ pub fn idiv_ceil(n: i32, d: u32) -> i32 {
 
 pub fn floor(x : f32) -> f32 { x.floor() }
 pub fn fract(x: f32) -> f32 { x.fract() }
-pub fn sqrt(x: f32) -> f32 { x.sqrt() }
+pub trait Sqrt { fn sqrt(self) -> Self; }
+impl Sqrt for f32 { fn sqrt(self) -> Self { f32::sqrt(self) } }
+impl Sqrt for f64 { fn sqrt(self) -> Self { f64::sqrt(self) } }
+pub fn sqrt<T:Sqrt>(x: T) -> T { x.sqrt() }
 pub fn cos(x: f32) -> f32 { x.cos() }
 pub fn sin(x: f32) -> f32 { x.sin() }
 pub fn atan(y: f32, x: f32) -> f32 { y.atan2(x) }
