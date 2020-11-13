@@ -27,7 +27,8 @@ use std::{ops::Mul, iter::Sum};
 pub fn sq<T:Copy+Mul>(x: T) -> T::Output { x*x }
 pub fn cb<T:Copy+Mul>(x: T) -> <T::Output as std::ops::Mul<T>>::Output where <T as std::ops::Mul>::Output : std::ops::Mul<T> { x*x*x }
 
-pub fn norm<T: Copy+Mul>(iter: impl IntoIterator<Item=T>) -> T::Output where T::Output:Sum+Sqrt { iter.into_iter().map(sq).sum::<T::Output>().sqrt() }
+pub fn ssq<T: Copy+Mul>(iter: impl IntoIterator<Item=T>) -> T::Output where T::Output:Sum+Sqrt { iter.into_iter().map(sq).sum::<T::Output>() }
+pub fn norm<T: Copy+Mul>(iter: impl IntoIterator<Item=T>) -> T::Output where T::Output:Sum+Sqrt { ssq(iter).sqrt() }
 
 pub fn div_floor(n : u32, d : u32) -> u32 { n/d }
 pub fn div_ceil(n : u32, d : u32) -> u32 { (n+d-1)/d }
