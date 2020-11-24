@@ -68,3 +68,9 @@ impl std::ops::Mul<f32> for Ratio { type Output=f32; fn mul(self, b: f32) -> Sel
 impl std::ops::Div<Ratio> for f32 { type Output=f32; fn div(self, r: Ratio) -> Self::Output { self * r.div as f32 / r.num as f32 } } // loses precision
 
 pub fn exp10(x: f64) -> f64 { f64::exp(f64::ln(10.)*x) }
+
+pub fn error<I:iter::IntoExactSizeIterator+iter::IntoIterator<Item=f64>>(iter: I) -> f64 {
+	let iter = iter::IntoIterator::into_iter(iter);
+	let len = iter.len();
+	(ssq(iter) / len as f64).sqrt()
+}
