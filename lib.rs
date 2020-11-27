@@ -30,10 +30,10 @@ pub fn cb<T:Copy+Mul>(x: T) -> <T::Output as std::ops::Mul<T>>::Output where <T 
 pub fn ssq<T: Copy+Mul>(iter: impl IntoIterator<Item=T>) -> T::Output where T::Output:Sum+Sqrt { iter.into_iter().map(sq).sum::<T::Output>() }
 pub fn norm<T: Copy+Mul>(iter: impl IntoIterator<Item=T>) -> T::Output where T::Output:Sum+Sqrt { ssq(iter).sqrt() }
 
-pub fn div_floor(n : u32, d : u32) -> u32 { n/d }
-pub fn div_ceil(n : u32, d : u32) -> u32 { (n+d-1)/d }
+pub fn div_floor(n: u32, d: u32) -> u32 { n/d }
+pub fn div_ceil(n: u32, d: u32) -> u32 { (n+d-1)/d }
 
-pub fn idiv_rem(n : i32, d : u32) -> (i32, i32) { (n/d as i32, n%d as i32) }
+pub fn idiv_rem(n: i32, d: u32) -> (i32, i32) { (n/d as i32, n%d as i32) }
 pub fn idiv_floor(n: i32, d: u32) -> i32 {
 	let (q, r) = idiv_rem(n, d);
 	if r < 0 { q - 1 } else { q }
@@ -68,6 +68,8 @@ impl std::ops::Mul<f32> for Ratio { type Output=f32; fn mul(self, b: f32) -> Sel
 impl std::ops::Div<Ratio> for f32 { type Output=f32; fn div(self, r: Ratio) -> Self::Output { self * r.div as f32 / r.num as f32 } } // loses precision
 
 pub fn exp10(x: f64) -> f64 { f64::exp(f64::ln(10.)*x) }
+
+pub fn relative_error(a: f64, b: f64) -> f64 { abs(b-a)/a.min(b) }
 
 pub fn error<I:iter::IntoExactSizeIterator+iter::IntoIterator<Item=f64>>(iter: I) -> f64 {
 	let iter = iter::IntoIterator::into_iter(iter);
