@@ -8,4 +8,4 @@ edition = '2018'
 path = 'lib.rs'
 
 [dependencies]
-iter = {path='../iter'}
+iter = {git='https://github.com/Matthias-Fauconneau/iter'}
