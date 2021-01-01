@@ -1,4 +1,4 @@
-#![feature(min_const_generics, const_in_array_repeat_expressions, const_fn)]
+#![feature(const_in_array_repeat_expressions, const_fn)]
 
 pub trait IsZero { fn is_zero(&self) -> bool; }
 
@@ -26,9 +26,20 @@ use std::{ops::Mul, iter::Sum};
 
 pub fn sq<T:Copy+Mul>(x: T) -> T::Output { x*x }
 pub fn cb<T:Copy+Mul>(x: T) -> <T::Output as std::ops::Mul<T>>::Output where <T as std::ops::Mul>::Output : std::ops::Mul<T> { x*x*x }
+pub fn pow(x: f64, k: f64) -> f64 { f64::powf(x, k) }
+pub fn powi(x: f64, k: i32) -> f64 { f64::powi(x, k) }
 
-pub fn ssq<T: Copy+Mul>(iter: impl IntoIterator<Item=T>) -> T::Output where T::Output:Sum+Sqrt { iter.into_iter().map(sq).sum::<T::Output>() }
-pub fn norm<T: Copy+Mul>(iter: impl IntoIterator<Item=T>) -> T::Output where T::Output:Sum+Sqrt { ssq(iter).sqrt() }
+pub fn floor(x : f32) -> f32 { x.floor() }
+pub fn fract(x: f32) -> f32 { x.fract() }
+pub trait Sqrt { fn sqrt(self) -> Self; }
+impl Sqrt for f32 { fn sqrt(self) -> Self { f32::sqrt(self) } }
+impl Sqrt for f64 { fn sqrt(self) -> Self { f64::sqrt(self) } }
+pub fn sqrt<T:Sqrt>(x: T) -> T { x.sqrt() }
+pub fn log(x: f64) -> f64 { f64::ln(x) }
+pub fn cos(x: f32) -> f32 { x.cos() }
+pub fn sin(x: f32) -> f32 { x.sin() }
+pub fn atan(y: f32, x: f32) -> f32 { y.atan2(x) }
+pub fn exp10(x: f64) -> f64 { f64::exp(f64::ln(10.)*x) }
 
 pub fn div_floor(n: u32, d: u32) -> u32 { n/d }
 pub fn div_ceil(n: u32, d: u32) -> u32 { (n+d-1)/d }
@@ -42,16 +53,6 @@ pub fn idiv_ceil(n: i32, d: u32) -> i32 {
 	let (q, r) = idiv_rem(n, d);
 	if r > 0 { q + 1 } else { q }
 }
-
-pub fn floor(x : f32) -> f32 { x.floor() }
-pub fn fract(x: f32) -> f32 { x.fract() }
-pub trait Sqrt { fn sqrt(self) -> Self; }
-impl Sqrt for f32 { fn sqrt(self) -> Self { f32::sqrt(self) } }
-impl Sqrt for f64 { fn sqrt(self) -> Self { f64::sqrt(self) } }
-pub fn sqrt<T:Sqrt>(x: T) -> T { x.sqrt() }
-pub fn cos(x: f32) -> f32 { x.cos() }
-pub fn sin(x: f32) -> f32 { x.sin() }
-pub fn atan(y: f32, x: f32) -> f32 { y.atan2(x) }
 
 #[derive(Clone,Copy,Debug,PartialEq)] pub struct Ratio { pub num: u32, pub div: u32 }
 impl Default for Ratio { fn default() -> Self { Self{num: 1, div: 1} } }
@@ -67,10 +68,10 @@ impl std::ops::Div<Ratio> for i32 { type Output=i32; fn div(self, r: Ratio) -> S
 impl std::ops::Mul<f32> for Ratio { type Output=f32; fn mul(self, b: f32) -> Self::Output { b * self.num as f32 / self.div as f32 } } // loses precision
 impl std::ops::Div<Ratio> for f32 { type Output=f32; fn div(self, r: Ratio) -> Self::Output { self * r.div as f32 / r.num as f32 } } // loses precision
 
-pub fn exp10(x: f64) -> f64 { f64::exp(f64::ln(10.)*x) }
-
 pub fn relative_error(a: f64, b: f64) -> f64 { abs(b-a)/a.min(b) }
 
+pub fn ssq<T: Copy+Mul>(iter: impl IntoIterator<Item=T>) -> T::Output where T::Output:Sum+Sqrt { iter.into_iter().map(sq).sum::<T::Output>() }
+pub fn norm<T: Copy+Mul>(iter: impl IntoIterator<Item=T>) -> T::Output where T::Output:Sum+Sqrt { ssq(iter).sqrt() }
 pub fn error<I:iter::IntoExactSizeIterator+iter::IntoIterator<Item=f64>>(iter: I) -> f64 {
 	let iter = iter::IntoIterator::into_iter(iter);
 	let len = iter.len();
