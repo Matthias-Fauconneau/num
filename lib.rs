@@ -32,9 +32,9 @@ pub fn powi(x: f64, k: i32) -> f64 { f64::powi(x, k) }
 pub fn floor(x : f32) -> f32 { x.floor() }
 pub fn fract(x: f32) -> f32 { x.fract() }
 pub trait Sqrt { fn sqrt(self) -> Self; }
-impl Sqrt for f32 { fn sqrt(self) -> Self { f32::sqrt(self) } }
-impl Sqrt for f64 { fn sqrt(self) -> Self { f64::sqrt(self) } }
-pub fn sqrt<T:Sqrt>(x: T) -> T { x.sqrt() }
+impl Sqrt for f32 { #[track_caller] fn sqrt(self) -> Self { assert!(self >= 0., "{}", self); f32::sqrt(self) } }
+impl Sqrt for f64 { #[track_caller] fn sqrt(self) -> Self { assert!(self >= 0., "{}", self); f64::sqrt(self) } }
+#[track_caller] pub fn sqrt<T:Sqrt>(x: T) -> T { x.sqrt() }
 pub fn log(x: f64) -> f64 { f64::ln(x) }
 pub fn cos(x: f32) -> f32 { x.cos() }
 pub fn sin(x: f32) -> f32 { x.sin() }
