@@ -1,4 +1,4 @@
-#![feature(const_in_array_repeat_expressions, const_fn)]
+#![feature(const_fn)]
 
 pub trait IsZero { fn is_zero(&self) -> bool; }
 
