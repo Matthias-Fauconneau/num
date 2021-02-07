@@ -68,7 +68,7 @@ impl std::ops::Div<Ratio> for i32 { type Output=i32; fn div(self, r: Ratio) -> S
 impl std::ops::Mul<f32> for Ratio { type Output=f32; fn mul(self, b: f32) -> Self::Output { b * self.num as f32 / self.div as f32 } } // loses precision
 impl std::ops::Div<Ratio> for f32 { type Output=f32; fn div(self, r: Ratio) -> Self::Output { self * r.div as f32 / r.num as f32 } } // loses precision
 
-pub fn relative_error(a: f64, b: f64) -> f64 { if a==0. && b==0. { 0. } else { abs(b-a)/a.min(b) } }
+pub fn relative_error(a: f64, b: f64) -> f64 { if a==0. && b==0. { 0. } else { abs(b-a)/abs(a).min(abs(b)) } }
 
 pub fn ssq<T: Copy+Mul>(iter: impl IntoIterator<Item=T>) -> T::Output where T::Output:Sum+Sqrt { iter.into_iter().map(sq).sum::<T::Output>() }
 pub fn norm<T: Copy+Mul>(iter: impl IntoIterator<Item=T>) -> T::Output where T::Output:Sum+Sqrt { ssq(iter).sqrt() }
