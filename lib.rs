@@ -3,9 +3,13 @@
 pub trait IsZero { fn is_zero(&self) -> bool; }
 
 pub trait Zero { const ZERO: Self; }
+impl Zero for u8 { const ZERO: Self = 0; }
+impl Zero for u16 { const ZERO: Self = 0; }
 impl Zero for u32 { const ZERO: Self = 0; }
 impl Zero for u64 { const ZERO : Self = 0; }
 impl Zero for usize { const ZERO : Self = 0; }
+impl Zero for i8 { const ZERO: Self = 0; }
+impl Zero for i16 { const ZERO: Self = 0; }
 impl Zero for i32 { const ZERO : Self = 0; }
 impl Zero for f32 { const ZERO : Self = 0.; }
 impl Zero for f64 { const ZERO : Self = 0.; }
@@ -68,7 +72,11 @@ impl std::ops::Div<Ratio> for i32 { type Output=i32; fn div(self, r: Ratio) -> S
 impl std::ops::Mul<f32> for Ratio { type Output=f32; fn mul(self, b: f32) -> Self::Output { b * self.num as f32 / self.div as f32 } } // loses precision
 impl std::ops::Div<Ratio> for f32 { type Output=f32; fn div(self, r: Ratio) -> Self::Output { self * r.div as f32 / r.num as f32 } } // loses precision
 
-pub fn relative_error(a: f64, b: f64) -> f64 { if a==0. && b==0. { 0. } else { abs(b-a)/abs(a).min(abs(b)) } }
+pub fn relative_error(a: f64, b: f64) -> f64 {
+    if a==0. && b==0. { 0. }
+    else if sign(a) != sign(b) { f64::INFINITY }
+    else abs(b-a)/abs(a).min(abs(b)) }
+}
 
 pub fn ssq<T: Copy+Mul>(iter: impl IntoIterator<Item=T>) -> T::Output where T::Output:Sum+Sqrt { iter.into_iter().map(sq).sum::<T::Output>() }
 pub fn norm<T: Copy+Mul>(iter: impl IntoIterator<Item=T>) -> T::Output where T::Output:Sum+Sqrt { ssq(iter).sqrt() }
@@ -77,3 +85,17 @@ pub fn error<I:iter::IntoExactSizeIterator+iter::IntoIterator<Item=f64>>(iter: I
 	let len = iter.len();
 	(ssq(iter) / len as f64).sqrt()
 }
+
+pub trait IsOne { fn is_one(&self) -> bool; }
+pub trait One { const ONE: Self; }
+impl One for u8 { const ONE: Self = 1; }
+impl One for i8 { const ONE : Self = 1; }
+impl One for f64 { const ONE : Self = 1.; }
+impl<T:One+PartialEq> IsOne for T { fn is_one(&self) -> bool { self == &One::ONE} }
+
+pub trait IsMinusOne { fn is_minus_one(&self) -> bool; }
+pub trait MinusOne { const MINUS_ONE: Self; }
+impl MinusOne for i8 { const MINUS_ONE: Self = -1; }
+impl MinusOne for f64 { const MINUS_ONE : Self = -1.; }
+impl<T:MinusOne+PartialEq> IsMinusOne for T { fn is_minus_one(&self) -> bool { self == &MinusOne::MINUS_ONE} }
+impl IsMinusOne for u8 { fn is_minus_one(&self) -> bool { false } }
