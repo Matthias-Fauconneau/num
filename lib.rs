@@ -75,7 +75,7 @@ impl std::ops::Div<Ratio> for f32 { type Output=f32; fn div(self, r: Ratio) -> S
 pub fn relative_error(a: f64, b: f64) -> f64 {
     if a==0. && b==0. { 0. }
     else if sign(a) != sign(b) { f64::INFINITY }
-    else abs(b-a)/abs(a).min(abs(b)) }
+    else { abs(b-a)/abs(a).min(abs(b)) }
 }
 
 pub fn ssq<T: Copy+Mul>(iter: impl IntoIterator<Item=T>) -> T::Output where T::Output:Sum+Sqrt { iter.into_iter().map(sq).sum::<T::Output>() }
