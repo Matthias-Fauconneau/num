@@ -1,4 +1,4 @@
-#![feature(const_fn)]
+#![feature(const_fn,const_fn_trait_bound)]
 
 pub trait IsZero { fn is_zero(&self) -> bool; }
 
@@ -39,13 +39,14 @@ pub trait Sqrt { fn sqrt(self) -> Self; }
 impl Sqrt for f32 { #[track_caller] fn sqrt(self) -> Self { assert!(self >= 0., "{}", self); f32::sqrt(self) } }
 impl Sqrt for f64 { #[track_caller] fn sqrt(self) -> Self { assert!(self >= 0., "{}", self); f64::sqrt(self) } }
 #[track_caller] pub fn sqrt<T:Sqrt>(x: T) -> T { x.sqrt() }
-pub fn log(x: f64) -> f64 { f64::ln(x) }
+pub fn log2(x: f64) -> f64 { f64::log2(x) }
+pub fn ln(x: f64) -> f64 { f64::ln(x) }
 pub fn cos(x: f32) -> f32 { x.cos() }
 pub fn sin(x: f32) -> f32 { x.sin() }
 pub fn atan(y: f32, x: f32) -> f32 { y.atan2(x) }
 pub fn exp10(x: f64) -> f64 { f64::exp(f64::ln(10.)*x) }
 
-pub fn div_floor(n: u32, d: u32) -> u32 { n/d }
+#[track_caller] pub fn div_floor(n: u32, d: u32) -> u32 { n/d }
 pub fn div_ceil(n: u32, d: u32) -> u32 { (n+d-1)/d }
 
 pub fn idiv_rem(n: i32, d: u32) -> (i32, i32) { (n/d as i32, n%d as i32) }
@@ -67,7 +68,7 @@ impl Ratio {
 }
 impl From<Ratio> for f32 { fn from(r: Ratio) -> Self { r.num as f32 / r.div as f32 } }
 impl std::ops::Mul<u32> for Ratio { type Output=u32; fn mul(self, b: u32) -> Self::Output { div_floor(b * self.num, self.div) } }
-impl std::ops::Div<Ratio> for u32 { type Output=u32; fn div(self, r: Ratio) -> Self::Output { div_floor(self * r.div, r.num) } }
+impl std::ops::Div<Ratio> for u32 { type Output=u32; #[track_caller] fn div(self, r: Ratio) -> Self::Output { div_floor(self * r.div, r.num) } }
 impl std::ops::Div<Ratio> for i32 { type Output=i32; fn div(self, r: Ratio) -> Self::Output { idiv_floor(self * r.div as i32, r.num) } }
 impl std::ops::Mul<f32> for Ratio { type Output=f32; fn mul(self, b: f32) -> Self::Output { b * self.num as f32 / self.div as f32 } } // loses precision
 impl std::ops::Div<Ratio> for f32 { type Output=f32; fn div(self, r: Ratio) -> Self::Output { self * r.div as f32 / r.num as f32 } } // loses precision
