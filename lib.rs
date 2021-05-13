@@ -1,4 +1,4 @@
-#![feature(const_fn,const_fn_trait_bound)]
+#![feature(const_fn_trait_bound)]
 
 pub trait IsZero { fn is_zero(&self) -> bool; }
 
