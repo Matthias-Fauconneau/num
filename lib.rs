@@ -59,7 +59,7 @@ pub fn idiv_ceil(n: i32, d: u32) -> i32 {
 	if r > 0 { q + 1 } else { q }
 }
 
-#[derive(Clone,Copy,Debug,PartialEq)] pub struct Ratio { pub num: u32, pub div: u32 }
+#[derive(Clone,Copy,Debug,PartialEq,Eq)] pub struct Ratio { pub num: u32, pub div: u32 }
 impl Default for Ratio { fn default() -> Self { Self{num: 1, div: 1} } }
 impl Ratio {
 	pub fn ceil(&self, x: u32) -> u32 { div_ceil(x * self.num, self.div) }
@@ -72,6 +72,8 @@ impl std::ops::Div<Ratio> for u32 { type Output=u32; #[track_caller] fn div(self
 impl std::ops::Div<Ratio> for i32 { type Output=i32; fn div(self, r: Ratio) -> Self::Output { idiv_floor(self * r.div as i32, r.num) } }
 impl std::ops::Mul<f32> for Ratio { type Output=f32; fn mul(self, b: f32) -> Self::Output { b * self.num as f32 / self.div as f32 } } // loses precision
 impl std::ops::Div<Ratio> for f32 { type Output=f32; fn div(self, r: Ratio) -> Self::Output { self * r.div as f32 / r.num as f32 } } // loses precision
+impl std::cmp::PartialOrd<Ratio> for Ratio { fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> { Some(self.cmp(other)) } }
+impl std::cmp::Ord for Ratio { fn cmp(&self, other: &Self) -> std::cmp::Ordering { (self.num*other.div).cmp(&(other.num*self.div)) } }
 
 pub fn relative_error(a: f64, b: f64) -> f64 {
     if a==0. && b==0. { 0. }
