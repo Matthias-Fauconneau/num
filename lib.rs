@@ -35,12 +35,12 @@ pub fn powi(x: f64, k: i32) -> f64 { f64::powi(x, k) }
 
 pub fn floor(x : f32) -> f32 { x.floor() }
 pub fn fract(x: f32) -> f32 { x.fract() }
-pub trait Sqrt { fn sqrt(self) -> Self; }
-impl Sqrt for f32 { #[track_caller] fn sqrt(self) -> Self { assert!(self >= 0., "{}", self); f32::sqrt(self) } }
-impl Sqrt for f64 { #[track_caller] fn sqrt(self) -> Self { assert!(self >= 0., "{}", self); f64::sqrt(self) } }
-#[track_caller] pub fn sqrt<T:Sqrt>(x: T) -> T { x.sqrt() }
+pub trait Sqrt { fn sqrt(&self) -> Self; }
+impl Sqrt for f32 { #[track_caller] fn sqrt(&self) -> Self { assert!(*self >= 0., "{}", self); f32::sqrt(*self) } }
+impl Sqrt for f64 { #[track_caller] fn sqrt(&self) -> Self { assert!(*self >= 0., "{}", self); f64::sqrt(*self) } }
+#[track_caller] pub fn sqrt<T:Sqrt>(x: impl std::borrow::Borrow<T>) -> T { x.borrow().sqrt() }
 pub fn log2(x: f64) -> f64 { f64::log2(x) }
-pub fn ln(x: f64) -> f64 { f64::ln(x) }
+pub fn ln(x: impl std::borrow::Borrow<f64>) -> f64 { f64::ln(*x.borrow()) }
 pub fn cos(x: f32) -> f32 { x.cos() }
 pub fn sin(x: f32) -> f32 { x.sin() }
 pub fn atan(y: f32, x: f32) -> f32 { y.atan2(x) }
