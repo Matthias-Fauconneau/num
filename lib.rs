@@ -35,12 +35,19 @@ pub fn powi(x: f64, k: i32) -> f64 { f64::powi(x, k) }
 
 pub fn floor(x : f32) -> f32 { x.floor() }
 pub fn fract(x: f32) -> f32 { x.fract() }
-pub trait Sqrt { fn sqrt(&self) -> Self; }
-impl Sqrt for f32 { #[track_caller] fn sqrt(&self) -> Self { assert!(*self >= 0., "{}", self); f32::sqrt(*self) } }
-impl Sqrt for f64 { #[track_caller] fn sqrt(&self) -> Self { assert!(*self >= 0., "{}", self); f64::sqrt(*self) } }
-#[track_caller] pub fn sqrt<T:Sqrt>(x: impl std::borrow::Borrow<T>) -> T { x.borrow().sqrt() }
-pub fn log2(x: f64) -> f64 { f64::log2(x) }
+
+pub trait Sqrt { fn sqrt(self) -> Self; }
+impl Sqrt for f32 { #[track_caller] fn sqrt(self) -> Self { assert!(self >= 0., "{}", self); Self::sqrt(self) } }
+impl Sqrt for f64 { #[track_caller] fn sqrt(self) -> Self { assert!(self >= 0., "{}", self); Self::sqrt(self) } }
+#[track_caller] pub fn sqrt<T:Sqrt>(x: T) -> T { x.sqrt() }
+
+pub trait Log { fn log2(self) -> Self; }
+impl Log for f32 { #[track_caller] fn log2(self) -> Self { assert!(self >= 0., "{}", self); Self::log2(self) } }
+impl Log for f64 { #[track_caller] fn log2(self) -> Self { assert!(self >= 0., "{}", self); Self::log2(self) } }
+#[track_caller] pub fn log2<T:Log>(x: T) -> T { x.log2() }
+
 pub fn ln(x: impl std::borrow::Borrow<f64>) -> f64 { f64::ln(*x.borrow()) }
+
 pub fn cos(x: f32) -> f32 { x.cos() }
 pub fn sin(x: f32) -> f32 { x.sin() }
 pub fn atan(y: f32, x: f32) -> f32 { y.atan2(x) }
