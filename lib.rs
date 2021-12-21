@@ -69,6 +69,7 @@ pub fn idiv_ceil(n: i32, d: u32) -> i32 {
 #[derive(Clone,Copy,Debug,PartialEq,Eq,Hash)] pub struct Ratio { pub num: u32, pub div: u32 }
 impl Default for Ratio { fn default() -> Self { Self{num: 1, div: 1} } }
 impl Ratio {
+	pub fn rcp(&self) -> Ratio { Self{num: self.div, div: self.num} }
 	pub fn ceil(&self, x: u32) -> u32 { div_ceil(x * self.num, self.div) }
 	pub fn ifloor(&self, x: i32) -> i32 { idiv_floor(x * self.num as i32, self.div) }
 	pub fn iceil(&self, x: i32) -> i32 { idiv_ceil(x * self.num as i32, self.div) }
