@@ -1,5 +1,3 @@
-#![feature(const_fn_trait_bound)]
-
 pub trait IsZero { fn is_zero(&self) -> bool; }
 
 pub trait Zero { const ZERO: Self; }
@@ -20,14 +18,16 @@ impl<T:Zero+PartialEq> IsZero for T { fn is_zero(&self) -> bool { self == &Zero:
 
 pub const fn zero<T:Zero>() -> T { T::ZERO }
 
+pub trait Option<T> { fn unwrap_or_zero(self) -> T; }
+impl<T:Zero> Option<T> for std::option::Option<T> { fn unwrap_or_zero(self) -> T { self.unwrap_or(zero()) }}
+
 pub trait Signed { fn signum(&self) -> Self; fn abs(&self) -> Self; }
 macro_rules! signed_impl { ($($T:ty)+) => ($( impl Signed for $T { fn signum(&self) -> Self { <$T>::signum(*self) } fn abs(&self) -> Self { <$T>::abs(*self) } } )+) }
 signed_impl!(i16 i32 f32 f64);
 pub fn sign<T:Signed>(x : T) -> T { x.signum() }
 pub fn abs<T:Signed>(x : T) -> T { x.abs() }
 
-use std::{ops::Mul, iter::Sum};
-
+use std::ops::Mul;
 pub fn sq<T:Copy+Mul>(x: T) -> T::Output { x*x }
 pub fn cb<T:Copy+Mul>(x: T) -> <T::Output as std::ops::Mul<T>>::Output where <T as std::ops::Mul>::Output : std::ops::Mul<T> { x*x*x }
 pub fn pow(x: f64, k: f64) -> f64 { f64::powf(x, k) }
@@ -81,21 +81,13 @@ impl std::ops::Div<Ratio> for u32 { type Output=u32; #[track_caller] fn div(self
 impl std::ops::Div<Ratio> for i32 { type Output=i32; fn div(self, r: Ratio) -> Self::Output { idiv_floor(self * r.div as i32, r.num) } }
 impl std::ops::Mul<f32> for Ratio { type Output=f32; fn mul(self, b: f32) -> Self::Output { b * self.num as f32 / self.div as f32 } } // loses precision
 impl std::ops::Div<Ratio> for f32 { type Output=f32; fn div(self, r: Ratio) -> Self::Output { self * r.div as f32 / r.num as f32 } } // loses precision
-impl std::cmp::PartialOrd<Ratio> for Ratio { fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> { Some(self.cmp(other)) } }
+impl std::cmp::PartialOrd<Ratio> for Ratio { fn partial_cmp(&self, other: &Self) -> std::option::Option<std::cmp::Ordering> { Some(self.cmp(other)) } }
 impl std::cmp::Ord for Ratio { fn cmp(&self, other: &Self) -> std::cmp::Ordering { (self.num*other.div).cmp(&(other.num*self.div)) } }
 
 pub fn relative_error(a: f64, b: f64) -> f64 {
     if a==0. && b==0. { 0. }
     else if sign(a) != sign(b) { f64::INFINITY }
     else { abs(b-a)/abs(a).min(abs(b)) }
-}
-
-pub fn ssq<T: Copy+Mul>(iter: impl IntoIterator<Item=T>) -> T::Output where T::Output:Sum+Sqrt { iter.into_iter().map(sq).sum::<T::Output>() }
-pub fn norm<T: Copy+Mul>(iter: impl IntoIterator<Item=T>) -> T::Output where T::Output:Sum+Sqrt { ssq(iter).sqrt() }
-pub fn error<I:iter::IntoExactSizeIterator+iter::IntoIterator<Item=f64>>(iter: I) -> f64 {
-	let iter = iter::IntoIterator::into_iter(iter);
-	let len = iter.len();
-	(ssq(iter) / len as f64).sqrt()
 }
 
 pub trait IsOne { fn is_one(&self) -> bool; }
