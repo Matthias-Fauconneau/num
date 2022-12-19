@@ -11,6 +11,7 @@ impl Zero for i16 { const ZERO: Self = 0; }
 impl Zero for i32 { const ZERO : Self = 0; }
 impl Zero for f32 { const ZERO : Self = 0.; }
 impl Zero for f64 { const ZERO : Self = 0.; }
+impl Zero for std::sync::atomic::AtomicU16 { const ZERO : Self = Self::new(0); }
 impl<T0:Zero,T1:Zero> Zero for (T0,T1) { const ZERO : Self = (Zero::ZERO,Zero::ZERO); }
 impl<T: Zero, const N: usize> Zero for [T; N] { const ZERO : Self = [Zero::ZERO; N]; }
 
@@ -54,7 +55,7 @@ pub fn atan(y: f32, x: f32) -> f32 { y.atan2(x) }
 pub fn exp10(x: f64) -> f64 { f64::exp(f64::ln(10.)*x) }
 
 #[track_caller] pub fn div_floor(n: u32, d: u32) -> u32 { n/d }
-pub fn div_ceil(n: u32, d: u32) -> u32 { (n+d-1)/d }
+#[track_caller] pub fn div_ceil(n: u32, d: u32) -> u32 { (n+d-1)/d }
 
 pub fn idiv_rem(n: i32, d: u32) -> (i32, i32) { (n/d as i32, n%d as i32) }
 pub fn idiv_floor(n: i32, d: u32) -> i32 {
@@ -68,6 +69,7 @@ pub fn idiv_ceil(n: i32, d: u32) -> i32 {
 
 #[derive(Clone,Copy,Debug,PartialEq,Eq,Hash)] pub struct Ratio { pub num: u32, pub div: u32 }
 #[allow(non_upper_case_globals)] pub const unit : Ratio = Ratio{num: 1, div: 1};
+#[allow(non_upper_case_globals)] pub const undefined : Ratio = Ratio{num: 0, div: 0};
 impl Default for Ratio { fn default() -> Self { unit } }
 impl Ratio {
 	pub fn rcp(&self) -> Ratio { Self{num: self.div, div: self.num} }
