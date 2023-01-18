@@ -14,7 +14,7 @@ impl Zero for f64 { const ZERO : Self = 0.; }
 impl Zero for std::sync::atomic::AtomicU16 { const ZERO : Self = Self::new(0); }
 impl<T0:Zero,T1:Zero> Zero for (T0,T1) { const ZERO : Self = (Zero::ZERO,Zero::ZERO); }
 impl<T: Zero, const N: usize> Zero for [T; N] { const ZERO : Self = [Zero::ZERO; N]; }
-
+impl<T: Zero> Zero for std::ops::Range<T> { const ZERO : Self = Zero::ZERO..Zero::ZERO; }
 impl<T:Zero+PartialEq> IsZero for T { fn is_zero(&self) -> bool { self == &Zero::ZERO} }
 
 pub const fn zero<T:Zero>() -> T { T::ZERO }
@@ -79,6 +79,7 @@ impl Ratio {
 }
 impl From<Ratio> for f32 { fn from(r: Ratio) -> Self { r.num as f32 / r.div as f32 } }
 impl std::ops::Mul<u32> for Ratio { type Output=u32; fn mul(self, b: u32) -> Self::Output { div_floor(b * self.num, self.div) } }
+impl std::ops::Mul<Ratio> for u32 { type Output=u32; fn mul(self, b: Ratio) -> Self::Output { b*self } }
 impl std::ops::Mul<i32> for Ratio { type Output=i32; fn mul(self, b: i32) -> Self::Output { self.ifloor(b) } }
 impl std::ops::Mul<Ratio> for Ratio { type Output=Ratio; fn mul(self, b: Ratio) -> Self::Output { Ratio{num: self.num * b.num, div: self.div * b.div} } }
 impl std::ops::Div<Ratio> for u32 { type Output=u32; #[track_caller] fn div(self, r: Ratio) -> Self::Output { div_floor(self * r.div, r.num) } }
