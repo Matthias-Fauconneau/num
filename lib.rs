@@ -38,6 +38,11 @@ pub fn powi(x: f64, k: i32) -> f64 { f64::powi(x, k) }
 pub fn floor(x : f32) -> f32 { x.floor() }
 pub fn fract(x: f32) -> f32 { x.fract() }
 
+pub trait Lerp<T> { fn lerp(&self, a: T, b: T) -> T; }
+pub fn lerp<T>(t: f32, a: T, b: T) -> T where f32:Lerp<T> { Lerp::lerp(&t, a, b) }
+impl Lerp<f32> for f32 { fn lerp(&self, a: f32, b: f32) -> f32 { let t=*self; assert!(t >= 0. && t<= 1.); (1.-t)*a + t*b } }
+impl Lerp<u32> for f32 { fn lerp(&self, a: u32, b: u32) -> u32 { let t=*self; assert!(t >= 0. && t<= 1.); f32::round((1.-t)*a as f32 + t*b as f32) as u32 } }
+
 pub trait Sqrt { fn sqrt(self) -> Self; }
 impl Sqrt for f32 { #[track_caller] fn sqrt(self) -> Self { assert!(self >= 0., "{}", self); Self::sqrt(self) } }
 impl Sqrt for f64 { #[track_caller] fn sqrt(self) -> Self { assert!(self >= 0., "{}", self); Self::sqrt(self) } }
