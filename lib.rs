@@ -1,4 +1,4 @@
-#![feature(int_roundings)]
+#![cfg_attr(feature="int_roundings",feature(int_roundings))]
 pub trait IsZero { fn is_zero(&self) -> bool; }
 
 pub trait Zero { const ZERO: Self; }
@@ -66,17 +66,17 @@ pub fn exp10(x: f64) -> f64 { f64::exp(f64::ln(10.)*x) }
 impl Default for Ratio { fn default() -> Self { unit } }
 impl Ratio {
 	pub fn rcp(&self) -> Ratio { Self{num: self.div, div: self.num} }
-	pub fn ceil(&self, x: u32) -> u32 { u32::div_ceil(x * self.num, self.div) }
-	pub fn ifloor(&self, x: i32) -> i32 { i32::div_floor(x * self.num as i32, self.div as i32) }
-	pub fn iceil(&self, x: i32) -> i32 { i32::div_ceil(x * self.num as i32, self.div as i32) }
+	#[cfg(feature="int_roundings")] pub fn ceil(&self, x: u32) -> u32 { u32::div_ceil(x * self.num, self.div) }
+	#[cfg(feature="int_roundings")] pub fn ifloor(&self, x: i32) -> i32 { i32::div_floor(x * self.num as i32, self.div as i32) }
+	#[cfg(feature="int_roundings")] pub fn iceil(&self, x: i32) -> i32 { i32::div_ceil(x * self.num as i32, self.div as i32) }
 }
 impl From<Ratio> for f32 { fn from(r: Ratio) -> Self { r.num as f32 / r.div as f32 } }
-impl std::ops::Mul<u32> for Ratio { type Output=u32; fn mul(self, b: u32) -> Self::Output { u32::div_floor(b * self.num, self.div) } }
-impl std::ops::Mul<Ratio> for u32 { type Output=u32; fn mul(self, b: Ratio) -> Self::Output { b*self } }
-impl std::ops::Mul<i32> for Ratio { type Output=i32; fn mul(self, b: i32) -> Self::Output { self.ifloor(b) } }
+#[cfg(feature="int_roundings")] impl std::ops::Mul<u32> for Ratio { type Output=u32; fn mul(self, b: u32) -> Self::Output { u32::div_floor(b * self.num, self.div) } }
+#[cfg(feature="int_roundings")] impl std::ops::Mul<Ratio> for u32 { type Output=u32; fn mul(self, b: Ratio) -> Self::Output { b*self } }
+#[cfg(feature="int_roundings")] impl std::ops::Mul<i32> for Ratio { type Output=i32; fn mul(self, b: i32) -> Self::Output { self.ifloor(b) } }
 impl std::ops::Mul<Ratio> for Ratio { type Output=Ratio; fn mul(self, b: Ratio) -> Self::Output { Ratio{num: self.num * b.num, div: self.div * b.div} } }
-impl std::ops::Div<Ratio> for u32 { type Output=u32; #[track_caller] fn div(self, r: Ratio) -> Self::Output { u32::div_floor(self * r.div, r.num) } }
-impl std::ops::Div<Ratio> for i32 { type Output=i32; fn div(self, r: Ratio) -> Self::Output { i32::div_floor(self * r.div as i32, r.num as i32) } }
+#[cfg(feature="int_roundings")] impl std::ops::Div<Ratio> for u32 { type Output=u32; #[track_caller] fn div(self, r: Ratio) -> Self::Output { u32::div_floor(self * r.div, r.num) } }
+#[cfg(feature="int_roundings")] impl std::ops::Div<Ratio> for i32 { type Output=i32; fn div(self, r: Ratio) -> Self::Output { i32::div_floor(self * r.div as i32, r.num as i32) } }
 impl std::ops::Mul<f32> for Ratio { type Output=f32; fn mul(self, b: f32) -> Self::Output { b * self.num as f32 / self.div as f32 } } // loses precision
 impl std::ops::Div<Ratio> for f32 { type Output=f32; fn div(self, r: Ratio) -> Self::Output { self * r.div as f32 / r.num as f32 } } // loses precision
 impl std::cmp::PartialOrd<Ratio> for Ratio { fn partial_cmp(&self, other: &Self) -> std::option::Option<std::cmp::Ordering> { Some(self.cmp(other)) } }
