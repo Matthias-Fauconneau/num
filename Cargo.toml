@@ -1,2 +1,3 @@
-package= {name= 'num', version= '0.0.0', edition= '2021'}
-lib= {path= 'lib.rs'}
+package={name= 'num', version= '0.0.0', edition= '2021'}
+lib={path= 'lib.rs'}
+features={int_roundings=[]}
