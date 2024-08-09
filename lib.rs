@@ -42,6 +42,7 @@ pub trait Lerp<T> { fn lerp(&self, a: T, b: T) -> T; }
 pub fn lerp<T>(t: f32, a: T, b: T) -> T where f32:Lerp<T> { Lerp::lerp(&t, a, b) }
 impl Lerp<f32> for f32 { fn lerp(&self, a: f32, b: f32) -> f32 { let t=*self; assert!(t >= 0. && t<= 1.); (1.-t)*a + t*b } }
 impl Lerp<u32> for f32 { fn lerp(&self, a: u32, b: u32) -> u32 { let t=*self; assert!(t >= 0. && t<= 1.); f32::round((1.-t)*a as f32 + t*b as f32) as u32 } }
+impl Lerp<u8> for f32 { fn lerp(&self, a: u8, b: u8) -> u8 { let t=*self; assert!(t >= 0. && t<= 1.); f32::round((1.-t)*a as f32 + t*b as f32) as u8 } }
 
 pub trait Sqrt { fn sqrt(self) -> Self; }
 impl Sqrt for f32 { #[track_caller] fn sqrt(self) -> Self { assert!(self >= 0., "{}", self); Self::sqrt(self) } }
