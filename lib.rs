@@ -1,3 +1,4 @@
+#![cfg_attr(not(feature="std"), no_std)]
 #![cfg_attr(feature="int_roundings",feature(int_roundings))]
 pub trait IsZero { fn is_zero(&self) -> bool; }
 
@@ -33,11 +34,11 @@ pub fn abs<T:Signed>(x : T) -> T { x.abs() }
 use core::ops::Mul;
 pub fn sq<T:Copy+Mul>(x: T) -> T::Output { x*x }
 pub fn cb<T:Copy+Mul>(x: T) -> <T::Output as core::ops::Mul<T>>::Output where <T as core::ops::Mul>::Output : core::ops::Mul<T> { x*x*x }
-pub fn pow(x: f64, k: f64) -> f64 { f64::powf(x, k) }
+#[cfg(feature="std")] pub fn pow(x: f64, k: f64) -> f64 { f64::powf(x, k) }
 pub fn powi(x: f64, k: i32) -> f64 { f64::powi(x, k) }
 
-pub fn floor(x : f32) -> f32 { x.floor() }
-pub fn fract(x: f32) -> f32 { x.fract() }
+#[cfg(feature="std")] pub fn floor(x : f32) -> f32 { x.floor() }
+#[cfg(feature="std")] pub fn fract(x: f32) -> f32 { x.fract() }
 
 pub trait Lerp<T> { fn lerp(&self, a: T, b: T) -> T; }
 #[track_caller] pub fn lerp<T>(t: f32, a: T, b: T) -> T where f32:Lerp<T> { Lerp::lerp(&t, a, b) }
