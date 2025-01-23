@@ -40,12 +40,11 @@ pub fn powi(x: f64, k: i32) -> f64 { f64::powi(x, k) }
 #[cfg(feature="std")] pub fn floor(x : f32) -> f32 { x.floor() }
 #[cfg(feature="std")] pub fn fract(x: f32) -> f32 { x.fract() }
 
-pub trait Lerp<T> { fn lerp(&self, a: T, b: T) -> T; }
-#[track_caller] pub fn lerp<T>(t: f32, a: T, b: T) -> T where f32:Lerp<T> { Lerp::lerp(&t, a, b) }
-//impl<T> Lerp<T> for f32 where f32:Mul<T>, <f32 as Mul<T>>::Output: core::ops::Add { fn lerp(&self, a: T, b: T) -> <f32 as Mul<T>>::Output::Output { let t=*self; assert!(t >= 0. && t<= 1.); (1.-t)*a + t*b } }
-impl Lerp<f32> for f32 { #[track_caller] fn lerp(&self, a: f32, b: f32) -> f32 { let t=*self; assert!(t >= 0. && t<= 1.); (1.-t)*a + t*b } }
-//impl Lerp<u32> for f32 { fn lerp(&self, a: u32, b: u32) -> u32 { let t=*self; assert!(t >= 0. && t<= 1.); f32::round((1.-t)*a as f32 + t*b as f32) as u32 } }
-//impl Lerp<u8> for f32 { fn lerp(&self, a: u8, b: u8) -> u8 { let t=*self; assert!(t >= 0. && t<= 1.); f32::round((1.-t)*a as f32 + t*b as f32) as u8 } }
+pub trait Lerp { fn lerp(t: f32, a: Self, b: Self) -> Self; }
+#[track_caller] pub fn lerp<T>(t: f32, a: T, b: T) -> T where T:Lerp { Lerp::lerp(t, a, b) }
+impl Lerp for f32 { #[track_caller] fn lerp(t: f32, a: Self, b: Self) -> Self { assert!(t >= 0. && t<= 1.); (1.-t)*a + t*b } }
+impl<const N: usize> Lerp for [f32; N] { #[track_caller] fn lerp(t: f32, a: Self, b: Self) -> Self { std::array::from_fn(|i| lerp(t, a[i], b[i])) } }
+impl<const M: usize, const N: usize> Lerp for [[f32; N]; M] { #[track_caller] fn lerp(t: f32, a: Self, b: Self) -> Self { std::array::from_fn(|i| lerp(t, a[i], b[i])) } }
 
 pub trait Sqrt { fn sqrt(self) -> Self; }
 impl Sqrt for f32 { #[track_caller] fn sqrt(self) -> Self { assert!(self >= 0., "{}", self); Self::sqrt(self) } }
